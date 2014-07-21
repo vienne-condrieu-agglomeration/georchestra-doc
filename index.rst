@@ -13,6 +13,7 @@ SOMMAIRE
    notes_install
    geOrchestra   
    configuration
-   addons   
+   addons
+   maj   
    code
    memo
