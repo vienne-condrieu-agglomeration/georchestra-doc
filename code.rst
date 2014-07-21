@@ -244,8 +244,8 @@ Script serveur1
    
    #VARIABLE DE PROFIL, VERSION et repertoire GitHub
    PROFILE=viennagglo
-   VERSION=14.01
-   GITDIR=/home/user/download/georchestra/
+   VERSION=14.06
+   GITDIR=/home/user/download/georchestra_1406/
    TOMCAT60=/opt/tomcat6/tomcat60
    TOMCAT61=/opt/tomcat6/tomcat61
    
@@ -265,17 +265,26 @@ Script serveur1
    
    #RENOMMER TOUT LES WAR
    mv security-proxy-${VERSION}-${PROFILE}.war ROOT.war
-   mv analytics-${VERSION}-${PROFILE}.war analytics-private.war
+   mv analytics-${VERSION}-${PROFILE}.war analytics.war
    mv cas-server-webapp-${VERSION}-${PROFILE}.war cas.war
-   mv catalogapp-${VERSION}-${PROFILE}.war catalogapp-private.war
-   mv downloadform-${VERSION}-${PROFILE}.war downloadform-private.war
-   mv extractorapp-${VERSION}-${PROFILE}.war extractorapp-private.war
-   mv geonetwork-main-${VERSION}-${PROFILE}.war geonetwork-private.war
+   mv catalogapp-${VERSION}-${PROFILE}.war catalogapp.war
+   mv downloadform-${VERSION}-${PROFILE}.war downloadform.war
+   mv extractorapp-${VERSION}-${PROFILE}.war extractorapp.war
+   mv geonetwork-main-${VERSION}-${PROFILE}.war geonetwork.war
    mv geoserver-webapp-${VERSION}-${PROFILE}.war geoserver.war
-   mv ldapadmin-${VERSION}-${PROFILE}.war ldapadmin-private.war
-   mv mapfishapp-${VERSION}-${PROFILE}.war mapfishapp-private.war
-   mv header-${VERSION}-${PROFILE}.war header-private.war
+   mv ldapadmin-${VERSION}-${PROFILE}.war ldapadmin.war
+   mv mapfishapp-${VERSION}-${PROFILE}.war mapfishapp.war
+   mv header-${VERSION}-${PROFILE}.war header.war
+   mv geowebcache-webapp-${VERSION}-${PROFILE}.war geowebcache.war
    echo RENAME OK
+   
+   #ARRET DE TOMCAT60
+   service tomcat60d stop
+   echo TOMCAT60 SHUTDOWN
+   
+   #ARRET DE TOMCAT61
+   service tomcat61d stop
+   echo TOMCAT61 SHUTDOWN
    
    #SUPRESSION DES  FICHIERS WAR (TOMCAT60)
    rm -Rf ${TOMCAT60}/webapps/ROOT*
@@ -283,18 +292,16 @@ Script serveur1
    echo WAR60 DELETED
    
    #SUPRESSION DES  FICHIERS WAR (TOMCAT61)
-   rm -Rf ${TOMCAT61}/webapps/*private*
+   rm -Rf ${TOMCAT61}/webapps/analytics*
+   rm -Rf ${TOMCAT61}/webapps/catalogapp*
+   rm -Rf ${TOMCAT61}/webapps/downloadform*
+   rm -Rf ${TOMCAT61}/webapps/extractorapp*
+   rm -Rf ${TOMCAT61}/webapps/geonetwork*
+   rm -Rf ${TOMCAT61}/webapps/ldapadmin*
+   rm -Rf ${TOMCAT61}/webapps/mapfishapp*
+   rm -Rf ${TOMCAT61}/webapps/header*
+   rm -Rf ${TOMCAT61}/webapps/geowebcache*
    echo WAR61 DELETED
-   
-   #ARRET DE TOMCAT60
-   cd ${TOMCAT60}/bin
-   su -p -s /bin/sh tomcat shutdown.sh
-   echo TOMCAT60 SHUTDOWN
-   
-   #ARRET DE TOMCAT61
-   cd ${TOMCAT61}/bin
-   su -p -s /bin/sh tomcat shutdown.sh
-   echo TOMCAT61 SHUTDOWN
    
    #COPIER le cas et root vers les webapps de TOMCAT60
    cp -f /tmp/georchestra_deploy_tmp/cas.war ${TOMCAT60}/webapps
@@ -302,18 +309,23 @@ Script serveur1
    echo COPY WAR60 OK
    
    #COPIER TOUT LES WAR VERS LES WEBAPPS DE TOMCAT61 SAUF GEOSERVER
-   cp -f /tmp/georchestra_deploy_tmp/*private.war ${TOMCAT61}/webapps
-   rm -f ${TOMCAT61}/webapps/geoserver-private.war
+   cp -f /tmp/georchestra_deploy_tmp/analytics.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/catalogapp.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/downloadform.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/extractorapp.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/geonetwork.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/ldapadmin.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/mapfishapp.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/header.war ${TOMCAT61}/webapps
+   cp -f /tmp/georchestra_deploy_tmp/geowebcache.war ${TOMCAT61}/webapps
    echo COPY WAR61 OK
    
    #DEMARRAGE DE TOMCAT 60
-   cd ${TOMCAT60}/bin
-   su -p -s /bin/sh tomcat startup.sh
+   service tomcat60d start
    echo TOMCAT60 STARTED
    
    #DEMARRAGE DE TOMCAT 61
-   cd ${TOMCAT61}/bin
-   su -p -s /bin/sh tomcat startup.sh
+   service tomcat60d start
    echo TOMCAT61 STARTED
    
    #Copie du war geoserver sur le serveur 2
